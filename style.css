@@ -1,0 +1,303 @@
+/* Main floating window */
+#floating-css-editor {
+    position: fixed;
+    width: 420px;
+    background: #1e1e1e;
+    border: 1px solid #3a3a3a;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    z-index: 9999;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+#floating-css-editor.dragging {
+    transition: none;
+    opacity: 0.95;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.9);
+}
+
+/* Collapsed state */
+#floating-css-editor.collapsed #css-content {
+    display: none;
+}
+
+#floating-css-editor.collapsed {
+    width: auto;
+    min-width: 220px;
+}
+
+/* Header */
+.floating-header {
+    background: linear-gradient(180deg, #2d2d30 0%, #252526 100%);
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+    user-select: none;
+    border-bottom: 1px solid #3a3a3a;
+}
+
+.header-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: #cccccc;
+    letter-spacing: 0.3px;
+}
+
+.header-controls {
+    display: flex;
+    gap: 6px;
+}
+
+/* Header buttons */
+.header-btn {
+    background: transparent;
+    border: 1px solid #3e3e42;
+    color: #cccccc;
+    width: 26px;
+    height: 26px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0;
+    transition: all 0.2s ease;
+}
+
+.header-btn:hover {
+    background: #3e3e42;
+    border-color: #555555;
+    transform: scale(1.05);
+}
+
+#close-btn:hover {
+    background: #e74c3c;
+    border-color: #e74c3c;
+    color: white;
+}
+
+#refresh-css-btn:hover {
+    background: #0e639c;
+    border-color: #1177bb;
+    color: white;
+}
+
+.header-btn i {
+    font-size: 11px;
+}
+
+/* Content */
+.floating-content {
+    padding: 14px;
+    background: #1e1e1e;
+}
+
+/* Info panel */
+.css-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #252526;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    font-size: 11px;
+    color: #858585;
+}
+
+#css-char-count {
+    color: #858585;
+    font-weight: 500;
+}
+
+#css-lines-count {
+    color: #858585;
+    font-weight: 500;
+}
+
+/* Textarea - VSCode style */
+#floating-customCSS {
+    width: 100%;
+    min-height: 320px;
+    max-height: 550px;
+    background: #1e1e1e !important;
+    color: #d4d4d4 !important;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    padding: 12px;
+    font-family: 'Consolas', 'Monaco', 'Menlo', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    resize: vertical;
+    margin-bottom: 12px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+#floating-customCSS:focus {
+    outline: none;
+    border-color: #0e639c;
+    box-shadow: 0 0 0 2px rgba(14, 99, 156, 0.25);
+}
+
+#floating-customCSS::placeholder {
+    color: #6a6a6a !important;
+    opacity: 1;
+    font-style: italic;
+}
+
+#floating-customCSS::selection {
+    background: #264f78;
+    color: #d4d4d4;
+}
+
+/* Scrollbar */
+#floating-customCSS::-webkit-scrollbar {
+    width: 12px;
+}
+
+#floating-customCSS::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+#floating-customCSS::-webkit-scrollbar-thumb {
+    background: #424242;
+    border-radius: 6px;
+    border: 2px solid #1e1e1e;
+}
+
+#floating-customCSS::-webkit-scrollbar-thumb:hover {
+    background: #4e4e4e;
+}
+
+/* Action buttons */
+.button-row {
+    display: flex;
+    gap: 10px;
+}
+
+.button-row .menu_button {
+    flex: 1;
+    padding: 9px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #2d2d30;
+    border: 1px solid #3e3e42;
+    color: #cccccc;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.button-row .menu_button:hover {
+    background: #3e3e42;
+    border-color: #555555;
+    transform: translateY(-1px);
+}
+
+.button-row .menu_button:active {
+    transform: translateY(0);
+}
+
+#apply-css:hover {
+    background: #0e639c;
+    border-color: #1177bb;
+    color: white;
+}
+
+#clear-css:hover {
+    background: #c1392d;
+    border-color: #e74c3c;
+    color: white;
+}
+
+/* FAB button */
+.editor-fab {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2d2d30 0%, #1e1e1e 100%);
+    border: 1px solid #3a3a3a;
+    color: #d4d4d4;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    z-index: 9998;
+    transition: all 0.3s ease;
+}
+
+.editor-fab:hover {
+    background: linear-gradient(135deg, #0e639c 0%, #1177bb 100%);
+    border-color: #1177bb;
+    transform: translateY(-4px) scale(1.08);
+    box-shadow: 0 10px 32px rgba(14, 99, 156, 0.4);
+}
+
+.editor-fab i {
+    font-size: 22px;
+}
+
+/* Settings panel */
+.floating-css-settings {
+    padding: 14px;
+    background: var(--black30a);
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.floating-css-settings .checkbox_label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    margin-bottom: 8px;
+}
+
+.floating-css-settings .checkbox_label:last-of-type {
+    margin-bottom: 0;
+}
+
+.floating-css-settings span {
+    font-size: 14px;
+    color: var(--SmartThemeEmColor);
+}
+
+.floating-css-settings small {
+    color: var(--SmartThemeEmColor);
+    opacity: 0.7;
+}
+
+/* Refresh button animation */
+@keyframes pulse-highlight {
+    0%, 100% {
+        background: transparent;
+        transform: scale(1);
+    }
+    50% {
+        background: #0e639c;
+        transform: scale(1.15);
+        border-color: #1177bb;
+    }
+}
+
+.highlight-pulse {
+    animation: pulse-highlight 0.6s ease-in-out 3;
+}
+
+#refresh-css-btn:hover {
+    transform: rotate(180deg) scale(1.05);
+    transition: all 0.4s ease;
+}

@@ -1,0 +1,12 @@
+{
+    "display_name": "Floating CSS Editor",
+    "loading_order": 100,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "KiskaSora",
+    "version": "1.0.0",
+    "homePage": "https://github.com/KiskaSora/Floating-CSS-Editor",
+    "auto_update": false
+}
