@@ -35,7 +35,8 @@ In Extensions panel:
 
 ## Screenshots
 
-![Floating CSS Editor](<img width="1688" height="842" alt="image" src="https://github.com/user-attachments/assets/e5cb363e-b99e-43b6-a80b-5be26b59121d" />)
+<img width="1688" height="842" alt="image" src="https://github.com/user-attachments/assets/4e373f71-6b91-4ab2-b05c-3edd2fe71bfe" />
+
 
 ## License
 
