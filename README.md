@@ -10,6 +10,7 @@ A draggable, CSS editor for SillyTavern that floats above your chat interface.
 - **Collapsible**: Minimize to header or hide completely
 - **FAB Button**: Quick access button when editor is hidden
 - **Smooth Animations**: Polished UI with subtle transitions
+- **Localization**: UI supports English (en) and Russian (ru) (auto-detected from browser language).
 
 ## Installation
 
