@@ -9,6 +9,7 @@
     z-index: 9999;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
+    will-change: width, height;
 }
 
 #floating-css-editor.dragging {
@@ -17,7 +18,6 @@
     box-shadow: 0 12px 48px rgba(0, 0, 0, 0.9);
 }
 
-/* Collapsed state */
 #floating-css-editor.collapsed #css-content {
     display: none;
 }
@@ -25,6 +25,8 @@
 #floating-css-editor.collapsed {
     width: auto;
     min-width: 220px;
+    height: auto !important;  /* ДОБАВИЛ ЭТО */
+    background: transparent;  /* ДОБАВИЛ ЭТО */
 }
 
 /* Header */
@@ -95,6 +97,9 @@
 .floating-content {
     padding: 14px;
     background: #1e1e1e;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 47px);
 }
 
 /* Info panel */
@@ -124,8 +129,10 @@
 /* Textarea - VSCode style */
 #floating-customCSS {
     width: 100%;
-    min-height: 320px;
-    max-height: 550px;
+    min-height: 200px;
+    max-height: none;
+    height: auto;
+    flex: 1;
     background: #1e1e1e !important;
     color: #d4d4d4 !important;
     border: 1px solid #3a3a3a;
@@ -134,7 +141,7 @@
     font-family: 'Consolas', 'Monaco', 'Menlo', 'Courier New', monospace;
     font-size: 13px;
     line-height: 1.6;
-    resize: vertical;
+    resize: none;
     margin-bottom: 12px;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -300,4 +307,56 @@
 #refresh-css-btn:hover {
     transform: rotate(180deg) scale(1.05);
     transition: all 0.4s ease;
+}
+
+/* Resize handle - optimized */
+.resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    cursor: nwse-resize;
+    z-index: 10;
+    will-change: transform;
+}
+
+.resize-handle::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 12px;
+    height: 12px;
+    background: linear-gradient(
+        135deg,
+        transparent 0%,
+        transparent 45%,
+        #555 45%,
+        #555 48%,
+        transparent 48%,
+        transparent 52%,
+        #555 52%,
+        #555 55%,
+        transparent 55%,
+        transparent 59%,
+        #555 59%,
+        #555 62%,
+        transparent 62%
+    );
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.resize-handle:hover::after {
+    opacity: 1;
+}
+
+#floating-css-editor.resizing {
+    user-select: none;
+    pointer-events: auto;
+}
+
+#floating-css-editor.resizing * {
+    pointer-events: none;
 }
