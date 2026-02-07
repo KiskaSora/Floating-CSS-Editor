@@ -24,7 +24,12 @@ const locales = {
         toast_applied: 'CSS applied',
         toast_cleared: 'CSS cleared',
         toast_changed_title: 'Theme Changed',
-        toast_changed_msg: 'Theme CSS loaded into editor'
+        toast_changed_msg: 'Theme CSS loaded into editor',
+        search_placeholder: 'Find...',
+        search_prev: 'Prev',
+        search_next: 'Next',
+        search_clear: 'Clear',
+        search_count_empty: '0/0'
     },
     ru: {
         settings_show: 'Показывать плавающий CSS редактор',
@@ -44,7 +49,12 @@ const locales = {
         toast_applied: 'CSS применен',
         toast_cleared: 'CSS очищен',
         toast_changed_title: 'Тема изменена',
-        toast_changed_msg: 'CSS темы загружен в редактор'
+        toast_changed_msg: 'CSS темы загружен в редактор',
+        search_placeholder: 'Поиск...',
+        search_prev: 'Назад',
+        search_next: 'Вперёд',
+        search_clear: 'Очистить',
+        search_count_empty: '0/0'
     }
 };
 
@@ -130,6 +140,17 @@ function createFloatingEditor() {
                     <span id="css-char-count">0 KB</span>
                     <span id="css-lines-count">0 ${t.info_lines}</span>
                 </div>
+            <div class="css-searchbar">
+              <input id="css-search-input" class="text_pole" type="search"
+                     placeholder="${t.search_placeholder}" autocomplete="off" />
+              <button id="css-search-prev" class="menu_button" type="button"
+                      title="${t.search_prev}">${t.search_prev}</button>
+              <button id="css-search-next" class="menu_button" type="button"
+                      title="${t.search_next}">${t.search_next}</button>
+              <span id="css-search-count">${t.search_count_empty}</span>
+              <button id="css-search-clear" class="menu_button" type="button"
+                      title="${t.search_clear}">${t.search_clear}</button>
+                 </div>
                 <textarea id="floating-customCSS" class="text_pole monospace" rows="15" placeholder="${t.placeholder}"></textarea>
                 <div class="button-row">
                     <button id="apply-css" class="menu_button">${t.btn_apply}</button>
@@ -164,7 +185,8 @@ function createFloatingEditor() {
     }
     
     syncWithOriginalCSS();
-    
+    initSearchUI();
+
     if (settings.isCollapsed) {
         $editor.addClass('collapsed');
     }
@@ -199,7 +221,7 @@ function syncWithOriginalCSS() {
             $originalCSS.val($(this).val());
             $originalCSS.trigger('input');
             updateLineCount();
-            
+            if ((searchState.query || '').trim()) queueRebuild();
             setTimeout(() => isSyncing = false, 50);
         });
         
@@ -212,7 +234,7 @@ function syncWithOriginalCSS() {
                 $floatingCSS.val($(this).val());
                 updateLineCount();
                 highlightRefreshButton();
-                
+                if ((searchState.query || '').trim()) queueRebuild();
                 setTimeout(() => isSyncing = false, 50);
             }
         });
@@ -258,6 +280,194 @@ function updateLineCount() {
         $('#css-lines-count').text(`${lines} ${t.info_lines}`);
         $('#css-char-count').text(`${sizeKB} KB`);
     }, 300);
+}
+const searchState = {
+    query: '',
+    matches: [],
+    current: -1,
+    timer: null,
+};
+
+function setSearchCount(current, total) {
+    if (!total) {
+        $('#css-search-count').text(t.search_count_empty);
+        return;
+    }
+    $('#css-search-count').text(`${current + 1}/${total}`);
+}
+
+function getLineHeightPx(el) {
+    const cs = getComputedStyle(el);
+    const lh = parseFloat(cs.lineHeight);
+    if (Number.isFinite(lh)) return lh;
+    const fs = parseFloat(cs.fontSize) || 13;
+    return Math.round(fs * 1.6);
+}
+
+function scrollToIndex(ta, index) {
+
+    // Создаём временный "клон" textarea
+    const div = document.createElement('div');
+
+    const style = getComputedStyle(ta);
+
+    // Копируем важные стили
+    [
+        'fontFamily',
+        'fontSize',
+        'lineHeight',
+        'padding',
+        'border',
+        'boxSizing',
+        'whiteSpace',
+        'wordWrap',
+        'width'
+    ].forEach(p => {
+        div.style[p] = style[p];
+    });
+
+    div.style.position = 'absolute';
+    div.style.visibility = 'hidden';
+    div.style.whiteSpace = 'pre-wrap';
+    div.style.wordWrap = 'break-word';
+
+    // Текст ДО совпадения
+    div.textContent = ta.value.slice(0, index);
+
+    // Маркер позиции
+    const span = document.createElement('span');
+    span.textContent = '.';
+    div.appendChild(span);
+
+    document.body.appendChild(div);
+
+    // Получаем реальную Y-позицию
+    const y = span.offsetTop;
+
+    document.body.removeChild(div);
+
+    // Центрируем
+    const target =
+        y - ta.clientHeight / 2 + parseInt(style.lineHeight);
+
+    ta.scrollTop = Math.max(0, target);
+}
+
+function selectSearchMatch(i) {
+    const ta = document.getElementById('floating-customCSS');
+    if (!ta) return;
+
+    const q = (searchState.query || '').trim();
+    const total = searchState.matches.length;
+    if (!q || !total) {
+        setSearchCount(0, 0);
+        return;
+    }
+
+    const start = searchState.matches[i];
+    const end = start + q.length;
+
+    ta.focus();
+    ta.setSelectionRange(start, end);
+    scrollToIndex(ta, start);
+
+    searchState.current = i;
+    setSearchCount(i, total);
+}
+
+function rebuildSearchMatches() {
+    const ta = document.getElementById('floating-customCSS');
+    if (!ta) return;
+
+    const q = (searchState.query || '').trim();
+    const text = ta.value || '';
+
+    searchState.matches = [];
+    searchState.current = -1;
+
+    if (!q) {
+        setSearchCount(0, 0);
+        return;
+    }
+
+    const hay = text.toLowerCase();
+    const needle = q.toLowerCase();
+
+    let idx = 0;
+    while (true) {
+        idx = hay.indexOf(needle, idx);
+        if (idx === -1) break;
+        searchState.matches.push(idx);
+        idx += Math.max(1, needle.length);
+    }
+
+    if (searchState.matches.length) {
+        searchState.current = -1;
+        setSearchCount(0, searchState.matches.length);
+    } else {
+        setSearchCount(0, 0);
+    }
+}
+
+function queueRebuild() {
+    if (searchState.timer) clearTimeout(searchState.timer);
+    searchState.timer = setTimeout(rebuildSearchMatches, 200);
+}
+
+function searchNext(dir = 1) {
+    const total = searchState.matches.length;
+    if (!total) return;
+
+    let i = searchState.current;
+    if (i < 0) i = 0;
+
+    i = (i + dir) % total;
+    if (i < 0) i = total - 1;
+
+    selectSearchMatch(i);
+}
+
+function initSearchUI() {
+    const $inp = $('#css-search-input');
+    const $ta = $('#floating-customCSS');
+
+    $inp.on('input', function () {
+        searchState.query = $(this).val() || '';
+        queueRebuild();
+    });
+
+    $('#css-search-next').on('click', () => searchNext(1));
+    $('#css-search-prev').on('click', () => searchNext(-1));
+
+    $('#css-search-clear').on('click', () => {
+        $('#css-search-input').val('');
+        searchState.query = '';
+        searchState.matches = [];
+        searchState.current = -1;
+        setSearchCount(0, 0);
+        $ta.trigger('focus');
+    });
+
+    $inp.on('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchNext(e.shiftKey ? -1 : 1);
+        }
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            $('#css-search-clear').trigger('click');
+        }
+    });
+
+    $ta.on('keydown', function (e) {
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'f' || e.key === 'F')) {
+            e.preventDefault();
+            $inp.trigger('focus');
+            $inp[0].select?.();
+        }
+    });
+
+    setSearchCount(0, 0);
 }
 
 function highlightRefreshButton() {
