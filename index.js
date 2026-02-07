@@ -59,6 +59,7 @@ const t = getLocale();
 const defaultSettings = {
     enabled: true,
     position: { top: 100, left: null },
+    size: { width: 420, height: null },
     isCollapsed: false,
     autoSync: true
 };
@@ -135,6 +136,7 @@ function createFloatingEditor() {
                     <button id="clear-css" class="menu_button">${t.btn_clear}</button>
                 </div>
             </div>
+            <div id="resize-handle" class="resize-handle"></div>
         </div>
         
         <button id="show-editor-fab" class="editor-fab" title="${t.fab_title}">
@@ -152,6 +154,15 @@ function createFloatingEditor() {
         left: settings.position.left + 'px'
     });
     
+    if (settings.size) {
+        if (settings.size.width) {
+            $editor.css('width', settings.size.width + 'px');
+        }
+        if (settings.size.height) {
+            $editor.css('height', settings.size.height + 'px');
+        }
+    }
+    
     syncWithOriginalCSS();
     
     if (settings.isCollapsed) {
@@ -166,6 +177,7 @@ function createFloatingEditor() {
     }
     
     makeDraggable();
+    makeResizable();
     setupEventHandlers();
     startThemeWatcher();
 }
@@ -304,6 +316,69 @@ function makeDraggable() {
         });
         
         e.preventDefault();
+    });
+}
+
+function makeResizable() {
+    const $editor = $('#floating-css-editor');
+    const $resizeHandle = $('#resize-handle');
+    
+    let isResizing = false;
+    let startX, startY, startWidth, startHeight;
+    let animationFrame = null;
+    
+    $resizeHandle.on('mousedown', function(e) {
+        isResizing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startWidth = $editor.width();
+        startHeight = $editor.height();
+        
+        $editor.addClass('resizing');
+        
+        $(document).on('mousemove.resize', function(e) {
+            if (!isResizing) return;
+            
+            // Используем requestAnimationFrame для плавности
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+            }
+            
+            animationFrame = requestAnimationFrame(() => {
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+                
+                const newWidth = Math.max(300, startWidth + deltaX);
+                const newHeight = Math.max(200, startHeight + deltaY);
+                
+                $editor.css({
+                    width: newWidth + 'px',
+                    height: newHeight + 'px'
+                });
+            });
+        });
+        
+        $(document).on('mouseup.resize', function() {
+            if (isResizing) {
+                isResizing = false;
+                $editor.removeClass('resizing');
+                $(document).off('.resize');
+                
+                if (animationFrame) {
+                    cancelAnimationFrame(animationFrame);
+                }
+                
+                const settings = loadSettings();
+                settings.size = {
+                    width: $editor.width(),
+                    height: $editor.height()
+                };
+                saveSettingsDebounced();
+            }
+        });
+        
+        e.preventDefault();
+        e.stopPropagation();
     });
 }
 
