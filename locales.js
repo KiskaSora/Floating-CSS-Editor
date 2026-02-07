@@ -23,7 +23,12 @@ const locales = {
         toast_applied: 'CSS applied',
         toast_cleared: 'CSS cleared',
         toast_theme_changed: 'Theme Changed',
-        toast_theme_loaded: 'Theme CSS loaded into editor'
+        toast_theme_loaded: 'Theme CSS loaded into editor'.,
+        search_placeholder: 'Find...',
+        search_prev: 'Prev',
+        search_next: 'Next',
+        search_clear: 'Clear',
+        search_count_empty: '0/0'
     },
     
     ru: {
@@ -50,7 +55,12 @@ const locales = {
         toast_applied: 'CSS применен',
         toast_cleared: 'CSS очищен',
         toast_theme_changed: 'Тема изменена',
-        toast_theme_loaded: 'CSS темы загружен в редактор'
+        toast_theme_loaded: 'CSS темы загружен в редактор',
+        search_placeholder: 'Поиск...',
+        search_prev: 'Назад',
+        search_next: 'Вперёд',
+        search_clear: 'Очистить',
+        search_count_empty: '0/0'
     },
     
     zh: {
