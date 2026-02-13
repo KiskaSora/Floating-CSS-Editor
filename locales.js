@@ -23,7 +23,7 @@ const locales = {
         toast_applied: 'CSS applied',
         toast_cleared: 'CSS cleared',
         toast_theme_changed: 'Theme Changed',
-        toast_theme_loaded: 'Theme CSS loaded into editor'.,
+        toast_theme_loaded: 'Theme CSS loaded into editor',
         search_placeholder: 'Find...',
         search_prev: 'Prev',
         search_next: 'Next',
@@ -61,33 +61,6 @@ const locales = {
         search_next: 'Вперёд',
         search_clear: 'Очистить',
         search_count_empty: '0/0'
-    },
-    
-    zh: {
-        settings_show: '显示浮动CSS编辑器',
-        settings_autosync: '主题更改时自动加载CSS',
-        settings_autosync_hint: '自动将新主题CSS加载到编辑器中',
-        
-        header_title: 'CSS编辑器',
-        header_refresh: '从主题刷新',
-        header_collapse: '折叠',
-        header_expand: '展开',
-        header_close: '关闭',
-        
-        info_lines: '行',
-        
-        placeholder: '在此粘贴您的CSS代码...',
-        
-        btn_apply: '应用',
-        btn_clear: '清除',
-        
-        fab_title: '打开CSS编辑器',
-        
-        toast_loaded: '主题CSS已加载',
-        toast_applied: 'CSS已应用',
-        toast_cleared: 'CSS已清除',
-        toast_theme_changed: '主题已更改',
-        toast_theme_loaded: '主题CSS已加载到编辑器'
     }
 };
 
