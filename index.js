@@ -29,7 +29,8 @@ const locales = {
         search_prev: 'Prev',
         search_next: 'Next',
         search_clear: 'Clear',
-        search_count_empty: '0/0'
+        search_count_empty: '0/0',
+        header_reset: 'Reset position'
     },
     ru: {
         settings_show: 'Показывать плавающий CSS редактор',
@@ -54,7 +55,8 @@ const locales = {
         search_prev: 'Назад',
         search_next: 'Вперёд',
         search_clear: 'Очистить',
-        search_count_empty: '0/0'
+        search_count_empty: '0/0',
+        header_reset: 'Сбросить положение'
     }
 };
 
@@ -95,6 +97,9 @@ function createSettingsUI() {
             <small style="display: block; margin-top: 8px; opacity: 0.7;">
                 ${t.settings_hint}
             </small>
+       <button id="reset-pos-btn" type="button" class="menu_button" style="margin-top: 10px; width: 100%; font-size: 12px; padding: 7px 14px;">
+    <i class="fa-solid fa-compress-arrows-alt" style="margin-right: 6px;"></i>${t.header_reset}
+  </button>
         </div>
     `;
     
@@ -115,6 +120,18 @@ function createSettingsUI() {
         saveSettingsDebounced();
     });
 }
+
+$(document).on('click', '#reset-pos-btn', function() {
+    const editor = $('#floating-css-editor');
+    const defaultTop  = defaultSettings.position.top;
+    const defaultLeft = window.innerWidth - 440;
+    editor.css({ top: defaultTop + 'px', left: defaultLeft + 'px' });
+    editor.show();
+    const settings = loadSettings();
+    settings.position = { top: defaultTop, left: defaultLeft };
+    saveSettingsDebounced();
+});
+
 
 function createFloatingEditor() {
     const settings = loadSettings();
@@ -481,50 +498,44 @@ function showThemeChangeNotification() {
 }
 
 function makeDraggable() {
-    const $editor = $('#floating-css-editor');
-    const $header = $('#css-header');
-    
+    const editor = $('#floating-css-editor');
     let isDragging = false;
     let startX, startY, initialLeft, initialTop;
-    
-    $header.on('mousedown', function(e) {
-        if ($(e.target).closest('.header-btn').length || $(e.target).is('i')) return;
-        
+
+    editor.on('mousedown', function(e) {
+        // Не начинаем drag при клике на кнопки, textarea, input, resize-handle
+        if ($(e.target).closest('button, textarea, input, .resize-handle').length) return;
         isDragging = true;
         startX = e.clientX;
         startY = e.clientY;
-        initialLeft = $editor.offset().left;
-        initialTop = $editor.offset().top;
-        
-        $editor.addClass('dragging');
-        
+        initialLeft = editor.offset().left;
+        initialTop = editor.offset().top;
+        editor.addClass('dragging');
+
         $(document).on('mousemove.drag', function(e) {
             if (!isDragging) return;
-            
             const deltaX = e.clientX - startX;
             const deltaY = e.clientY - startY;
-            
-            $editor.css({
+            editor.css({
                 left: (initialLeft + deltaX) + 'px',
-                top: (initialTop + deltaY) + 'px'
+                top:  (initialTop  + deltaY) + 'px'
             });
         });
-        
+
         $(document).on('mouseup.drag', function() {
             if (isDragging) {
                 isDragging = false;
-                $editor.removeClass('dragging');
+                editor.removeClass('dragging');
                 $(document).off('.drag');
-                
                 const settings = loadSettings();
                 settings.position = {
-                    top: parseInt($editor.css('top')),
-                    left: parseInt($editor.css('left'))
+                    top:  parseInt(editor.css('top')),
+                    left: parseInt(editor.css('left'))
                 };
                 saveSettingsDebounced();
             }
         });
-        
+
         e.preventDefault();
     });
 }
@@ -604,6 +615,7 @@ function setupEventHandlers() {
             $floatingCSS.val($originalCSS.val());
             updateLineCount();
             toastr.success(t.toast_loaded);
+    
         }
     });
     
@@ -651,6 +663,7 @@ function setupEventHandlers() {
         toastr.info(t.toast_cleared);
     });
 }
+
 
 function toggleEditorVisibility(enabled) {
     const $editor = $('#floating-css-editor');
